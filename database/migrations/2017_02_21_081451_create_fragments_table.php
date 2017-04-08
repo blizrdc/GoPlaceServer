@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateFragmentsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('fragments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('classnumber');
+            $table->integer('classid');
+            $table->string('name', 15);
+            $table->string('picture', 10);
+            $table->integer('requirednumber');
+            $table->integer('requiredcost');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('fragments');
+    }
+}
