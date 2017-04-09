@@ -127,7 +127,8 @@ class TaskController extends Controller {
 			] );
 		}
 	}
-	public function Prompt($lat = '', $lng = '', $_tokenpasswd = '') {
+	
+	public function Prompt(Request $request, $lat = '', $lng = '', $_tokenpasswd = '') {
 		$status = '200';
 		if (Auth::check ()) {
 			// 进行登陆方式验证，防止暴力登陆
