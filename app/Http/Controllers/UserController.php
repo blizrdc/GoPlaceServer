@@ -86,7 +86,7 @@ class UserController extends Controller {
 		$attribute = Base::getOriginalArray ( $attributeCollection );
 		
 		// 使用csrf_token设置用户访问密钥，防止暴力访问
-		$request->session()->pull('_tokenpasswd',csrf_token());
+		$request->session()->put('_tokenpasswd',csrf_token());
 		
 		// 以json格式返回数据
 		return response ()->json ( [ 
