@@ -15,7 +15,7 @@ class Base extends Model {
 		foreach ( $collection as $key => $value ) {
 			$OriginalArray [$key] = $value->getOriginal ();
 		}
-		return $OriginalArr;
+		return $OriginalArray;
 	}
 	
 	// 业务错误的返回
