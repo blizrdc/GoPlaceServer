@@ -18,6 +18,7 @@ Route::post('user/login','UserController@Login');
 Route::post('task/show','TaskController@Show');
 Route::post('task/start','TaskController@Start');
 Route::get('task/demonstrate','TaskController@Demonstrate');
+Route::get('task/test','TaskController@Test');
 Route::get('task/prompt','TaskController@Prompt');
 Auth::routes();
 

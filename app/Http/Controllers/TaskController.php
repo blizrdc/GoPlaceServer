@@ -166,10 +166,14 @@ class TaskController extends Controller
 			// 处理初始坐标
 			$baidumap = new BaiduMap();
 			$coordinate = $baidumap->exchangeCoordinate($latitude, $longitude);
-
+			
+			// 获得任务目的信息
+			$task_information = explode(':', Redis::get($user['id'].':'.$user['email'].':taskinformation'));
+			
+			// 生成提示视图并展示
 			$location = array ();
-			$location ['latitude'] = $latitude;
-			$location ['longitude'] = $longitude;
+			$location ['latitude'] = $task_information[0];
+			$location ['longitude'] = $task_information[1];
 			$location ['mylat'] = $coordinate['latitude'];
 			$location ['mylng'] = $coordinate['longitude'];
 			return view('prompt')->with('location',$location);
@@ -184,12 +188,9 @@ class TaskController extends Controller
 	}
 	
 // 	public function Test() {
-// 		Base::errorByStatus([
-// 				'status'=>"700",
-// 				'obj_status'=>'123'
-// 		]);
-// 		echo Json::encode(['status' => 1]);
-// 		//exit();
+// 		$s = '117:123:123123:123';
+// 		$adt = explode(':', $s);
+// 		print_r($adt);
 // 	}
 	
 // 	public  function a() {
