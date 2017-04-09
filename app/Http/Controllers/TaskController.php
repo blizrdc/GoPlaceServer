@@ -145,14 +145,9 @@ class TaskController extends Controller {
 				] );
 			}
 			
-			// 获得POST参数
-			$lat = $request->input ( "latitude" );
-			$lng = $request->input ( "longitude" );
-			$_tokenpasswd = $request->input ( "_tokenpasswd" );
-			
 			// 处理初始坐标
 			$baidumap = new BaiduMap ();
-			$coordinate = $baidumap->exchangeCoordinate ( $latitude, $longitude );
+			$coordinate = $baidumap->exchangeCoordinate ( $lat, $lng );
 			
 			// 获得任务目的信息
 			$task_information = explode ( ':', Redis::get ( $user ['id'] . ':' . $user ['email'] . ':taskinformation' ) );
