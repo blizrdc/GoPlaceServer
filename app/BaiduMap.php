@@ -19,8 +19,8 @@ class BaiduMap extends Model {
 		$url_respone_json = file_get_contents ( $url );
 		$url_respone_obj = json_decode ( $url_respone_json );
 		if ($url_respone_obj->status != 0) {
-			$status = "700";
-			return response ()->json ( [ 
+			$status = '700';
+			Base::errorByStatus ( [ 
 					'status' => $status,
 					'obj_status' => $url_respone_obj->status 
 			] );
@@ -66,33 +66,33 @@ class BaiduMap extends Model {
 	
 	/**
 	 * 获得最终LBS数据
-	 * 
-	 * @param unknown $place
-	 * @param unknown $latitude
-	 * @param unknown $longitude
+	 *
+	 * @param unknown $place        	
+	 * @param unknown $latitude        	
+	 * @param unknown $longitude        	
 	 * @return \Illuminate\Http\JsonResponse|NULL|\Illuminate\Http\JsonResponse|unknown
 	 */
 	public function getLbsInforMation($place, $latitude, $longitude) {
 		$url = 'http://api.map.baidu.com/place/v2/search?query=' . $place . '&page_size=20&scope=2&location=' . $latitude . ',' . $longitude . '&radius=3000&page_num=0&output=json&ak=XQBSCXFdxDbcndHFjH56lpKLNPm5VEqv';
 		$url_respone_json = file_get_contents ( $url );
-		$url_respone_obj  = json_decode ( $url_respone_json );
+		$url_respone_obj = json_decode ( $url_respone_json );
 		if ($url_respone_obj->status != 0) {
-			$status = "701";
-			return response ()->json ( [ 
+			$status = '701';
+			Base::errorByStatus ( [ 
 					'status' => $status,
 					'obj_status' => $url_respone_obj->status 
 			] );
 		}
 		
 		if ($url_respone_obj->total == 0) {
-			$status = "713";
-			return response ()->json ( [
-					'status' => $status,
+			$status = '713';
+			Base::errorByStatus ( [ 
+					'status' => $status 
 			] );
 		}
 		
-		$place_information = array();
-		$total =  $url_respone_obj->total;
+		$place_information = array ();
+		$total = $url_respone_obj->total;
 		if ($total <= 3) {
 			for($i = 0; $i < $total; $i ++) {
 				$place_information [$i] ['num'] = $i;
@@ -103,38 +103,37 @@ class BaiduMap extends Model {
 			$place_information [2] ['num'] = rand ( 0, $total - 1 );
 		}
 		
-		for ($i = 0; $i < count($place_information); $i++) {
-			$remainder = $place_information[$i]['num'] % 20;
-			$page_num = ( $place_information[$i]['num'] - $remainder) / 20;
-			$place_information[$i]['place'] = $this->getOneLbsPlace($place, $latitude, $longitude, $remainder, $page_num);
+		for($i = 0; $i < count ( $place_information ); $i ++) {
+			$remainder = $place_information [$i] ['num'] % 20;
+			$page_num = ($place_information [$i] ['num'] - $remainder) / 20;
+			$place_information [$i] ['place'] = $this->getOneLbsPlace ( $place, $latitude, $longitude, $remainder, $page_num );
 		}
 		
 		return $place_information;
-		
 	}
 	
 	/**
 	 * 获得单独需要的LBS数据
-	 * 
-	 * @param unknown $place
-	 * @param unknown $latitude
-	 * @param unknown $longitude
-	 * @param unknown $remainder
-	 * @param unknown $page_num
+	 *
+	 * @param unknown $place        	
+	 * @param unknown $latitude        	
+	 * @param unknown $longitude        	
+	 * @param unknown $remainder        	
+	 * @param unknown $page_num        	
 	 * @return \Illuminate\Http\JsonResponse|unknown
 	 */
 	private function getOneLbsPlace($place, $latitude, $longitude, $remainder, $page_num) {
-		$url = 'http://api.map.baidu.com/place/v2/search?query=' . $place . '&page_size=20&scope=2&location=' . $latitude . ',' . $longitude . '&radius=3000&page_num='.$page_num.'&output=json&ak=XQBSCXFdxDbcndHFjH56lpKLNPm5VEqv';
+		$url = 'http://api.map.baidu.com/place/v2/search?query=' . $place . '&page_size=20&scope=2&location=' . $latitude . ',' . $longitude . '&radius=3000&page_num=' . $page_num . '&output=json&ak=XQBSCXFdxDbcndHFjH56lpKLNPm5VEqv';
 		$url_respone_json = file_get_contents ( $url );
-		$url_respone_obj  = json_decode ( $url_respone_json );
+		$url_respone_obj = json_decode ( $url_respone_json );
 		if ($url_respone_obj->status != 0) {
-			$status = "701";
-			return response ()->json ( [
+			$status = '701';
+			Base::errorByStatus ( [ 
 					'status' => $status,
-					'obj_status' => $url_respone_obj->status
+					'obj_status' => $url_respone_obj->status 
 			] );
 		}
-		$place_information = $url_respone_obj->results[$remainder];
+		$place_information = $url_respone_obj->results [$remainder];
 		return $place_information;
-	} 
+	}
 }

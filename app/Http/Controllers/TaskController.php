@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Psy\Util\Json;
 use App\BaiduMap;
 use Illuminate\Support\Facades\Redis;
+use App\Base;
 
 class TaskController extends Controller
 {
@@ -46,16 +47,13 @@ class TaskController extends Controller
 			$_tokenpasswd = $request->input("_tokenpasswd");
 			
 			// 进行登陆方式验证，防止暴力登陆
-			if ($_tokenpasswd != $request->session()->get("_tokenpasswd")) {
-				$status = '500';
-				return response ()->json ( [
-						'status' => $status,
-				] );
-			}
+			Base::tokenPasswdVerificate($request, $_tokenpasswd);
 			
 			//生成LBS信息
 			$baidumap = new BaiduMap();
 			$coordinate = $baidumap->exchangeCoordinate($latitude, $longitude);
+			
+			
 			$result_place_value = $baidumap->randForPlace();
 			$place_information = $baidumap->getLbsInforMation($result_place_value, $latitude, $longitude);
 			
@@ -96,7 +94,7 @@ class TaskController extends Controller
 			// 判断是否还有未完成任务
 			$task_status_value = Redis::get($user['id'].':'.$user['email'].':taskstatus');
 			if ($task_status_value == '1') {
-				$status = '900';
+				$status = '901';
 				return response ()->json ( [
 						'status' => $status
 				] );
@@ -111,12 +109,7 @@ class TaskController extends Controller
 			$_tokenpasswd = $request->input("_tokenpasswd");
 			
 			// 进行登陆方式验证，防止暴力登陆
-			if ($_tokenpasswd != $request->session()->get("_tokenpasswd")) {
-				$status = '500';
-				return response ()->json ( [
-						'status' => $status,
-				] );
-			}
+			Base::tokenPasswdVerificate($request, $_tokenpasswd);
 			
 			// 向Redis写入任务
 			$task_status_key = $user['id'].':'.$user['email'].':taskstatus';
@@ -139,9 +132,12 @@ class TaskController extends Controller
 		  }
 	}
 	
-	public function Login() {
+	public function Prompt(Request $request) {
 		$status = '200';
 		if (Auth::check()) {
+			// 进行登陆方式验证，防止暴力登陆
+			Base::tokenPasswdVerificate($request, $_tokenpasswd);
+			
 			// 二次判断是否由POST方法传入参数
 			if (! $request->isMethod ( 'POST' )) {
 				$status = '600';
@@ -152,17 +148,32 @@ class TaskController extends Controller
 		
 			// 获得用户基本信息
 			$user = Auth::user();
+			
+			// 判断是否还有未完成任务
+			$task_status_value = Redis::get($user['id'].':'.$user['email'].':taskstatus');
+			if ($task_status_value == '0') {
+				$status = '900';
+				return response ()->json ( [
+						'status' => $status
+				] );
+			}
 				
 			// 获得POST参数
 			$lat = $request->input("latitude");
 			$lng = $request->input("longitude");
 			$_tokenpasswd = $request->input("_tokenpasswd");
 				
-			// 进行登陆方式验证，防止暴力登陆
-			User::tokenPasswdVerificate($request, $_tokenpasswd);
-				
+			// 处理初始坐标
+			$baidumap = new BaiduMap();
+			$coordinate = $baidumap->exchangeCoordinate($latitude, $longitude);
+
+			$location = array ();
+			$location ['latitude'] = $latitude;
+			$location ['longitude'] = $longitude;
+			$location ['mylat'] = $coordinate['latitude'];
+			$location ['mylng'] = $coordinate['longitude'];
+			return view('prompt')->with('location',$location);
 			
-				
 		} else {
 			// 未登录
 			$status = '400';
@@ -171,4 +182,17 @@ class TaskController extends Controller
 			] );
 		}
 	}
+	
+// 	public function Test() {
+// 		Base::errorByStatus([
+// 				'status'=>"700",
+// 				'obj_status'=>'123'
+// 		]);
+// 		echo Json::encode(['status' => 1]);
+// 		//exit();
+// 	}
+	
+// 	public  function a() {
+// 		echo response()->json(['status' => 1]);
+// 	}
 }
