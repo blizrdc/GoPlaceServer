@@ -172,14 +172,4 @@ class TaskController extends Controller {
 			] );
 		}
 	}
-	
-	// public function Test() {
-	// $s = '117:123:123123:123';
-	// $adt = explode(':', $s);
-	// print_r($adt);
-	// }
-	
-	// public function a() {
-	// echo response()->json(['status' => 1]);
-	// }
 }
