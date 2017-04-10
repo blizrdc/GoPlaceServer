@@ -210,7 +210,7 @@ class TaskController extends Controller {
 			$task_information = explode ( ':', Redis::get ( $id . ':' . $email . ':taskinformation' ) );
 			
 			// 计算距离
-			$distance = Base::distanceBetween ( $coordinate ['latitude'], $coordinate ['longitude'], $task_information [0], $task_information [1] );
+			$distance = 0;//Base::distanceBetween ( $coordinate ['latitude'], $coordinate ['longitude'], $task_information [0], $task_information [1] );
 			
 			//返回信息
 			if ($distance < 60) {
