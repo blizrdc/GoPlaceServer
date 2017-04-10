@@ -16,7 +16,6 @@ class TaskController extends Controller {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->middleware ( 'auth' );
 	}
 	
 	/**
@@ -128,44 +127,32 @@ class TaskController extends Controller {
 		}
 	}
 	
-	public function Prompt(Request $request, $lat = '', $lng = '', $_tokenpasswd = '') {
+	public function Prompt($lat = -1, $lng = -1, $id = -1, $email = '') {
 		$status = '200';
-		if (Auth::check ()) {
-			// 进行登陆方式验证，防止暴力登陆
-			Base::tokenPasswdVerificate ( $request, $_tokenpasswd );
-			
-			// 获得用户基本信息
-			$user = Auth::user ();
-			
-			// 判断是否还有未完成任务
-			$task_status_value = Redis::get ( $user ['id'] . ':' . $user ['email'] . ':taskstatus' );
-			if ($task_status_value == '0') {
-				$status = '900';
-				return response ()->json ( [ 
-						'status' => $status 
-				] );
-			}
-			
-			// 处理初始坐标
-			$baidumap = new BaiduMap ();
-			$coordinate = $baidumap->exchangeCoordinate ( $lat, $lng );
-			
-			// 获得任务目的信息
-			$task_information = explode ( ':', Redis::get ( $user ['id'] . ':' . $user ['email'] . ':taskinformation' ) );
-			
-			// 生成提示视图并展示
-			$location = array ();
-			$location ['latitude'] = $task_information [0];
-			$location ['longitude'] = $task_information [1];
-			$location ['mylat'] = $coordinate ['latitude'];
-			$location ['mylng'] = $coordinate ['longitude'];
-			return view ( 'prompt' )->with ( 'location', $location );
-		} else {
-			// 未登录
-			$status = '400';
+		
+		Base::promptGetVerificate ( $lat, $lng, $id, $email );
+		// 判断是否还有未完成任务
+		$task_status_value = Redis::get ( $id . ':' . $email . ':taskstatus' );
+		if ($task_status_value == '0') {
+			$status = '900';
 			return response ()->json ( [ 
 					'status' => $status 
 			] );
 		}
+		
+		// 处理初始坐标
+		$baidumap = new BaiduMap ();
+		$coordinate = $baidumap->exchangeCoordinate ( $lat, $lng );
+		
+		// 获得任务目的信息
+		$task_information = explode ( ':', Redis::get ( $id . ':' . $email . ':taskinformation' ) );
+		
+		// 生成提示视图并展示
+		$location = array ();
+		$location ['latitude'] = $task_information [0];
+		$location ['longitude'] = $task_information [1];
+		$location ['mylat'] = $coordinate ['latitude'];
+		$location ['mylng'] = $coordinate ['longitude'];
+		return view ( 'prompt' )->with ( 'location', $location );
 	}
 }

@@ -20,14 +20,24 @@ class Base extends Model {
 	
 	// 业务错误的返回
 	public static function errorByStatus($data) {
-		echo Json::encode($data);
-		exit();
+		echo Json::encode ( $data );
+		exit ();
 	}
 	
 	// 暴力访问的CSRF标签验证
 	public static function tokenPasswdVerificate(Request $request, $_tokenpasswd) {
-		if ($_tokenpasswd != $request->session()->get("_tokenpasswd")) {
+		if ($_tokenpasswd != $request->session ()->get ( "_tokenpasswd" )) {
 			$status = '500';
+			Base::errorByStatus ( [ 
+					'status' => $status 
+			] );
+		}
+	}
+	
+	// 用于Prompt的输入验证
+	public static function promptGetVerificate($lat = -1, $lng = -1, $id = -1, $email = '') {
+		if ($lat == -1 || $lng == -1 || $id == -1 || $email == '') {
+			$status = '600';
 			Base::errorByStatus([
 					'status' => $status
 			]);
