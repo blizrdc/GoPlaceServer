@@ -217,11 +217,8 @@ class TaskController extends Controller {
 				// 向Redis写入任务
 				$task_status_key = $user ['id'] . ':' . $user ['email'] . ':taskstatus';
 				$task_status_value = '0';
-				$task_information_key = $user ['id'] . ':' . $user ['email'] . ':taskinformation';
 				Redis::set ( $task_status_key, $task_status_value );
 				
-				// 删除任务地点
-				Redis::delete ( $task_information_key );
 				return response ()->json ( [
 						'status' => $status,
 						'message' => '恭喜你, 任务完成',
