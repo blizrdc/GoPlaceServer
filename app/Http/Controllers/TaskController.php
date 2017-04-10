@@ -166,7 +166,7 @@ class TaskController extends Controller {
 	}
 	
 	/**
-	 * 任务验证
+	 * 任务提交验证
 	 * 
 	 * @param Request $request
 	 * @return \Illuminate\Http\JsonResponse
