@@ -207,8 +207,8 @@ class TaskController extends Controller {
 			$coordinate = $baidumap->exchangeCoordinate ( $latitude, $longitude );
 			
 			// 获得任务目地信息
-			$task_information = explode ( ':', Redis::get ( $user ['id'] . ':' . $user ['id'] . ':taskinformation' ) );
-			
+			$task_information = explode ( ':', Redis::get ( $user ['id'] . ':' . $user ['email'] . ':taskinformation' ) );
+			 
 			// 计算距离
 			$distance = Base::distanceBetween ( $coordinate ['latitude'], $coordinate ['longitude'], $task_information [0], $task_information [1] );
 			
