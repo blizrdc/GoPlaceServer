@@ -127,10 +127,19 @@ class TaskController extends Controller {
 		}
 	}
 	
-	public function Prompt($lat = -1, $lng = -1, $id = -1, $email = '') {
+	/**
+	 * 提示任务
+	 * 
+	 * @param unknown $lat 
+	 * @param unknown $lng
+	 * @param unknown $id
+	 * @param string $email
+	 * @return \Illuminate\Http\JsonResponse|unknown
+	 */
+	public function Prompt($latitude = -1, $longitude = -1, $id = -1, $email = '') {
 		$status = '200';
 		
-		Base::promptGetVerificate ( $lat, $lng, $id, $email );
+		Base::promptGetVerificate ( $latitude, $longitude, $id, $email );
 		// 判断是否还有未完成任务
 		$task_status_value = Redis::get ( $id . ':' . $email . ':taskstatus' );
 		if ($task_status_value == '0') {
@@ -142,7 +151,7 @@ class TaskController extends Controller {
 		
 		// 处理初始坐标
 		$baidumap = new BaiduMap ();
-		$coordinate = $baidumap->exchangeCoordinate ( $lat, $lng );
+		$coordinate = $baidumap->exchangeCoordinate ( $latitude, $longitude );
 		
 		// 获得任务目的信息
 		$task_information = explode ( ':', Redis::get ( $id . ':' . $email . ':taskinformation' ) );
@@ -154,5 +163,59 @@ class TaskController extends Controller {
 		$location ['mylat'] = $coordinate ['latitude'];
 		$location ['mylng'] = $coordinate ['longitude'];
 		return view ( 'prompt' )->with ( 'location', $location );
+	}
+	
+	public function Submit(Request $request) {
+		$status = '200';
+		if (Auth::check ()) {
+			// 二次判断是否由POST方法传入参数
+			if (! $request->isMethod ( 'POST' )) {
+				$status = '600';
+				return response ()->json ( [
+						'status' => $status
+				] );
+			}
+				
+			// 获得用户基本信息
+			$user = Auth::user ();
+				
+			// 判断是否还有未完成任务
+			$task_status_value = Redis::get ( $user ['id'] . ':' . $user ['email'] . ':taskstatus' );
+			if ($task_status_value == '1') {
+				$status = '901';
+				return response ()->json ( [
+						'status' => $status
+				] );
+			}
+				
+			// 获得POST参数
+			$lat = $request->input ( "lat" );
+			$lng = $request->input ( "lng" );
+			$name = $request->input ( "name" );
+			$address = $request->input ( "address" );
+			$uid = $request->input ( "uid" );
+			$_tokenpasswd = $request->input ( "_tokenpasswd" );
+				
+			// 进行登陆方式验证，防止暴力登陆
+			Base::tokenPasswdVerificate ( $request, $_tokenpasswd );
+				
+			// 向Redis写入任务
+			$task_status_key = $user ['id'] . ':' . $user ['email'] . ':taskstatus';
+			$task_status_value = '1';
+			$task_information_key = $user ['id'] . ':' . $user ['email'] . ':taskinformation';
+			$task_information_value = $lat . ':' . $lng . ':' . $name . ':' . $address . ':' . $uid;
+			Redis::set ( $task_status_key, $task_status_value );
+			Redis::set ( $task_information_key, $task_information_value );
+				
+			return response ()->json ( [
+					'status' => $status
+			] );
+		} else {
+			// 未登录
+			$status = '400';
+			return response ()->json ( [
+					'status' => $status
+			] );
+		}
 	}
 }
