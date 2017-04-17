@@ -91,7 +91,7 @@ class UserController extends Controller {
 		// 以json格式返回数据
 		return response ()->json ( [ 
 				'status' => $status,
-			    'userallinfo' => [ 
+			    'userAllInfo' => [ 
 						'id' => $user [0] ['original'] ['id'],
 						'name' => $user [0] ['original'] ['name'],
 						'email' => $user [0] ['original'] ['email'],
