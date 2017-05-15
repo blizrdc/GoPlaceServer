@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Userattribute;
 use Psy\Util\Json;
+use App\Base;
 
 class BattleController extends Controller {
 	/**
