@@ -11,6 +11,7 @@ use App\Weapon;
 use App\Base;
 use App\Userattribute;
 use Psy\Util\Json;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller {
 	
@@ -19,15 +20,13 @@ class UserController extends Controller {
 	 *
 	 * @return void
 	 */
-	public function __construct()
-	{
-		
+	public function __construct() {
 	}
 	
 	/**
 	 * 用户登陆方法，通过传入的邮箱密码参数，进行登陆验证，以及用户的个人信息返回
-	 * 
-	 * @param Request $request
+	 *
+	 * @param Request $request        	
 	 * @return \Illuminate\Http\JsonResponse User All Information
 	 */
 	public function Login(Request $request) {
@@ -51,7 +50,7 @@ class UserController extends Controller {
 		] )) {
 			$status = '300';
 			return response ()->json ( [ 
-					'status' => $status,
+					'status' => $status 
 			] );
 		}
 		
@@ -86,7 +85,10 @@ class UserController extends Controller {
 		$attribute = Base::getOriginalArray ( $attributeCollection );
 		
 		// 使用csrf_token设置用户访问密钥，防止暴力访问
-		$request->session()->put('_tokenpasswd',csrf_token());
+		$request->session ()->put ( '_tokenpasswd', csrf_token () );
+		
+		// 获得用户任务是否进行
+		$task_status_value = Redis::get ( $userid . ':' . $email . ':taskstatus' );
 		
 		// 以json格式返回数据
 		return response ()->json ( [ 
@@ -108,6 +110,7 @@ class UserController extends Controller {
 				'peteggs' => $peteggs,
 				'moneys' => $moneys,
 				'attribute' => $attribute,
+				'task_status' => $task_status_value,
 				'_tokenpasswd' => $request->session()->get('_tokenpasswd')
 		] );
 	}
