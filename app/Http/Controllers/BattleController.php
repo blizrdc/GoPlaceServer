@@ -60,7 +60,7 @@ class BattleController extends Controller {
 			$advancedUserAttribute ['criticaldamage'] = 25;
 			$advancedUserAttribute ['name'] = '高级电脑';
 			
-			return response () - json ( [ 
+			return response ()->json ( [ 
 					'primary' => $primaryUserAttribute,
 					'intermediate' => $intermediateUserAttribute,
 					'advanced' => $advancedUserAttribute 
@@ -73,6 +73,4 @@ class BattleController extends Controller {
 			] );
 		}
 	}
-	
-	
 }
