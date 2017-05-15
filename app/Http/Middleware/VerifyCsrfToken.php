@@ -16,5 +16,6 @@ class VerifyCsrfToken extends BaseVerifier
     		'task/show',
     		'task/start',
     		'task/submit',
+    		'battle/getlist',
     ];
 }
