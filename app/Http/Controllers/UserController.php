@@ -50,7 +50,7 @@ class UserController extends Controller {
 		] )) {
 			$status = '300';
 			return response ()->json ( [ 
-					'status' => $status 
+					'status' => $status.'(账号密码错误)' 
 			] );
 		}
 		
