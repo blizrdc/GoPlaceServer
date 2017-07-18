@@ -92,7 +92,7 @@ class TaskController extends Controller {
 			if ($task_status_value == '1') {
 				$status = '901';
 				return response ()->json ( [ 
-						'status' => $status 
+						'status' => $status.'(已选择任务)' 
 				] );
 			}
 			
